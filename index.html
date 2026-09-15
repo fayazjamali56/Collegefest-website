@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GreenStump — Live Cricket Scores, Rankings &amp; News</title>
+<meta name="description" content="Live cricket scores, ball-by-ball scorecards, ICC rankings and news — all in one place.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   GREENSTUMP — DESIGN TOKENS
+   ============================================================ */
+:root{
+  --pitch-950:#081712;
+  --pitch-900:#0d2018;
+  --pitch-800:#123024;
+  --pitch-700:#183d2e;
+  --pitch-600:#1f4c3a;
+  --line:rgba(243,239,225,0.10);
+  --line-strong:rgba(243,239,225,0.18);
+  --cream:#f4f0e2;
+  --cream-dim:#c9c4ae;
+  --cream-faint:#8f9a8f;
+  --willow:#cf9f2e;
+  --willow-bright:#e8bc4c;
+  --ball:#b8402f;
+  --ball-bright:#d95a41;
+  --ink:#0c1310;
+
+  --font-display:'Fraunces', Georgia, serif;
+  --font-body:'Inter', system-ui, -apple-system, sans-serif;
+
+  --radius-s:6px;
+  --radius-m:12px;
+  --radius-l:20px;
+
+  --shadow-deep:0 20px 60px -20px rgba(0,0,0,0.55);
+  --container:1180px;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:
+    radial-gradient(ellipse 900px 500px at 15% -10%, rgba(207,159,46,0.10), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 100% 0%, rgba(31,76,58,0.35), transparent 55%),
+    var(--pitch-950);
+  color:var(--cream);
+  font-family:var(--font-body);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+}
+img{max-width:100%;display:block;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;margin:0;letter-spacing:-0.01em;}
+p{margin:0;}
+:focus-visible{outline:2px solid var(--willow-bright);outline-offset:3px;}
+.wrap{max-width:var(--container);margin:0 auto;padding:0 28px;}
+.hidden{display:none !important;}
+.tnum{font-variant-numeric:tabular-nums;}
+
+/* section scaffolding */
+.section{padding:88px 0;border-top:1px solid var(--line);}
+.section-head{max-width:640px;margin-bottom:44px;}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  color:var(--willow-bright);font-weight:600;font-size:0.9rem;margin-bottom:14px;
+}
+.eyebrow::before{content:"";width:18px;height:2px;background:var(--willow-bright);border-radius:2px;}
+.section-head h2{font-size:clamp(1.7rem,3vw,2.5rem);}
+.section-head p{color:var(--cream-dim);margin-top:12px;font-size:1.05rem;max-width:56ch;}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+header.site-header{
+  position:sticky;top:0;z-index:60;
+  background:rgba(8,23,18,0.86);
+  backdrop-filter:blur(10px) saturate(140%);
+  border-bottom:1px solid var(--line);
+}
+.header-inner{
+  max-width:var(--container);margin:0 auto;padding:0 28px;
+  height:76px;display:flex;align-items:center;justify-content:space-between;gap:24px;
+}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand svg{width:34px;height:34px;flex-shrink:0;}
+.brand-name{font-family:var(--font-display);font-size:1.45rem;font-weight:700;color:var(--cream);}
+.brand-name em{font-style:normal;color:var(--willow-bright);}
+
+nav.primary-nav{display:flex;align-items:center;gap:2px;}
+nav.primary-nav a{
+  padding:10px 16px;border-radius:999px;font-weight:500;font-size:0.96rem;color:var(--cream-dim);
+  transition:color .15s ease, background-color .15s ease;
+  white-space:nowrap;
+}
+nav.primary-nav a:hover{color:var(--cream);background:rgba(243,239,225,0.06);}
+nav.primary-nav a.active{color:var(--pitch-950);background:var(--willow-bright);font-weight:600;}
+
+.header-actions{display:flex;align-items:center;gap:10px;}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:10px 20px;border-radius:999px;font-weight:600;font-size:0.94rem;
+  border:1px solid transparent;cursor:pointer;transition:transform .12s ease, background-color .15s ease, border-color .15s ease;
+  white-space:nowrap;
+}
+.btn:active{transform:scale(0.97);}
+.btn-ghost{background:transparent;border-color:var(--line-strong);color:var(--cream);}
+.btn-ghost:hover{border-color:var(--willow-bright);color:var(--willow-bright);}
+.btn-solid{background:var(--willow-bright);color:var(--pitch-950);}
+.btn-solid:hover{background:#f2cd68;}
+.btn-outline-cream{background:transparent;border-color:var(--cream-dim);color:var(--cream);}
+.btn-outline-cream:hover{border-color:var(--cream);}
+.btn-full{width:100%;}
+.btn-sm{padding:8px 14px;font-size:0.85rem;}
+
+.menu-toggle{
+  display:none;background:transparent;border:1px solid var(--line-strong);border-radius:10px;
+  width:44px;height:44px;align-items:center;justify-content:center;color:var(--cream);
+}
+.menu-toggle svg{width:20px;height:20px;}
+
+/* mobile drawer */
+.mobile-drawer{
+  position:fixed;top:0;right:0;height:100%;width:min(320px,84vw);z-index:90;
+  background:var(--pitch-900);border-left:1px solid var(--line-strong);
+  transform:translateX(100%);transition:transform .32s cubic-bezier(.22,.9,.3,1);
+  display:flex;flex-direction:column;padding:22px;gap:6px;box-shadow:var(--shadow-deep);
+}
+.mobile-drawer.open{transform:translateX(0);}
+.drawer-top{display:flex;justify-content:flex-end;margin-bottom:10px;}
+.drawer-close{background:transparent;border:1px solid var(--line-strong);border-radius:10px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:var(--cream);}
+.mobile-drawer a.drawer-link{
+  padding:14px 12px;border-radius:10px;font-weight:500;font-size:1.05rem;color:var(--cream);
+  border-bottom:1px solid var(--line);
+}
+.mobile-drawer a.drawer-link.active{color:var(--willow-bright);}
+.drawer-auth{margin-top:18px;display:flex;flex-direction:column;gap:10px;}
+.scrim{
+  position:fixed;inset:0;background:rgba(4,10,8,0.6);z-index:80;opacity:0;pointer-events:none;
+  transition:opacity .25s ease;backdrop-filter:blur(2px);
+}
+.scrim.show{opacity:1;pointer-events:auto;}
+
+@media (max-width:900px){
+  nav.primary-nav, .header-actions{display:none;}
+  .menu-toggle{display:flex;}
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{padding:76px 0 56px;position:relative;overflow:hidden;}
+.hero-grid{display:grid;grid-template-columns:1.15fr 0.85fr;gap:56px;align-items:center;}
+.hero h1{font-size:clamp(2.4rem,5.2vw,4.1rem);line-height:1.04;color:var(--cream);}
+.hero h1 .accent{color:var(--willow-bright);font-style:italic;}
+.hero p.lede{margin-top:20px;font-size:1.15rem;color:var(--cream-dim);max-width:52ch;}
+.hero-cta{margin-top:32px;display:flex;gap:14px;flex-wrap:wrap;}
+
+.hero-panel{
+  background:linear-gradient(165deg, var(--pitch-800), var(--pitch-700));
+  border:1px solid var(--line-strong);border-radius:var(--radius-l);
+  padding:26px;box-shadow:var(--shadow-deep);
+}
+.hero-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.live-tag{display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:0.8rem;color:var(--ball-bright);}
+.pulse-dot{width:8px;height:8px;border-radius:50%;background:var(--ball-bright);position:relative;}
+.pulse-dot::after{
+  content:"";position:absolute;inset:-5px;border-radius:50%;border:1.5px solid var(--ball-bright);
+  animation:pulse 1.8s ease-out infinite;
+}
+@keyframes pulse{0%{transform:scale(0.6);opacity:0.9;}100%{transform:scale(1.9);opacity:0;}}
+.hero-match{padding:12px 0;border-top:1px solid var(--line);}
+.hero-match:first-of-type{border-top:none;}
+.hero-teams{display:flex;justify-content:space-between;font-weight:600;color:var(--cream);gap:10px;}
+.hero-teams span.score{color:var(--willow-bright);}
+.hero-status{color:var(--cream-faint);font-size:0.85rem;margin-top:5px;}
+
+/* ticker */
+.ticker-bar{
+  margin-top:44px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:14px 0;overflow:hidden;position:relative;
+}
+.ticker-track{display:flex;gap:48px;width:max-content;animation:scroll-left 38s linear infinite;}
+.ticker-bar:hover .ticker-track{animation-play-state:paused;}
+@keyframes scroll-left{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.ticker-item{display:flex;align-items:center;gap:10px;font-size:0.92rem;color:var(--cream-dim);white-space:nowrap;}
+.ticker-item b{color:var(--cream);font-weight:600;}
+.ticker-dot{width:6px;height:6px;border-radius:50%;background:var(--willow-bright);}
+
+/* quick links */
+.quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:56px;}
+.quick-card{
+  background:var(--pitch-800);border:1px solid var(--line);border-radius:var(--radius-m);
+  padding:26px;transition:border-color .15s ease, transform .15s ease;
+}
+.quick-card:hover{border-color:var(--willow);transform:translateY(-3px);}
+.quick-card svg{width:28px;height:28px;color:var(--willow-bright);margin-bottom:14px;}
+.quick-card h3{font-size:1.15rem;color:var(--cream);margin-bottom:6px;}
+.quick-card p{color:var(--cream-dim);font-size:0.94rem;}
+.quick-card .goto{display:inline-block;margin-top:14px;font-size:0.88rem;font-weight:600;color:var(--willow-bright);}
+
+@media (max-width:900px){
+  .hero-grid{grid-template-columns:1fr;}
+  .quick-grid{grid-template-columns:1fr;}
+}
+
+/* ============================================================
+   TABS (shared: live scores + rankings)
+   ============================================================ */
+.tabbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+.tab-pill{
+  padding:9px 18px;border-radius:999px;border:1px solid var(--line-strong);background:transparent;
+  color:var(--cream-dim);font-weight:500;font-size:0.92rem;transition:.15s ease;
+}
+.tab-pill.active{background:var(--willow-bright);border-color:var(--willow-bright);color:var(--pitch-950);font-weight:700;}
+.tab-pill:hover:not(.active){border-color:var(--willow);color:var(--cream);}
+.tabbar-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:30px;}
+
+/* ============================================================
+   MATCH CARDS
+   ============================================================ */
+.match-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(300px,1fr));gap:18px;}
+.match-card{
+  background:var(--pitch-800);border:1px solid var(--line);border-radius:var(--radius-m);
+  padding:20px;cursor:pointer;transition:border-color .15s ease, transform .15s ease;
+  display:flex;flex-direction:column;gap:14px;text-align:left;color:inherit;width:100%;
+}
+.match-card:hover{border-color:var(--willow);transform:translateY(-2px);}
+.match-card:focus-visible{border-color:var(--willow-bright);}
+.match-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.match-series{font-size:0.78rem;color:var(--cream-faint);font-weight:500;}
+.status-chip{
+  font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.status-chip.live{background:rgba(184,64,47,0.18);color:var(--ball-bright);}
+.status-chip.live .pulse-dot{width:6px;height:6px;}
+.status-chip.finished{background:rgba(243,239,225,0.08);color:var(--cream-dim);}
+.status-chip.upcoming{background:rgba(207,159,46,0.16);color:var(--willow-bright);}
+
+.match-teams{display:flex;flex-direction:column;gap:10px;}
+.team-row{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.team-name{font-weight:600;color:var(--cream);font-size:0.98rem;}
+.team-score{font-weight:700;color:var(--willow-bright);font-size:0.98rem;}
+.match-status-line{color:var(--cream-dim);font-size:0.85rem;border-top:1px solid var(--line);padding-top:12px;}
+.venue-line{color:var(--cream-faint);font-size:0.78rem;}
+
+.state-msg{
+  grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--cream-faint);
+  border:1px dashed var(--line-strong);border-radius:var(--radius-m);
+}
+.state-msg strong{display:block;color:var(--cream);font-size:1.05rem;margin-bottom:6px;font-family:var(--font-display);font-weight:600;}
+
+/* ============================================================
+   MODAL — SCORECARD
+   ============================================================ */
+.modal-scrim{
+  position:fixed;inset:0;background:rgba(5,12,9,0.72);backdrop-filter:blur(3px);
+  z-index:120;display:flex;align-items:flex-start;justify-content:center;
+  padding:5vh 18px;opacity:0;pointer-events:none;transition:opacity .2s ease;overflow-y:auto;
+}
+.modal-scrim.show{opacity:1;pointer-events:auto;}
+.modal-card{
+  background:var(--pitch-900);border:1px solid var(--line-strong);border-radius:var(--radius-l);
+  max-width:760px;width:100%;box-shadow:var(--shadow-deep);
+  transform:translateY(14px) scale(0.985);transition:transform .22s cubic-bezier(.22,.9,.3,1);
+  margin-bottom:5vh;
+}
+.modal-scrim.show .modal-card{transform:translateY(0) scale(1);}
+.modal-head{
+  padding:24px 26px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;
+  position:sticky;top:0;background:var(--pitch-900);border-radius:var(--radius-l) var(--radius-l) 0 0;
+}
+.modal-head h3{font-size:1.3rem;color:var(--cream);}
+.modal-head .match-series{margin-top:4px;}
+.modal-close{background:transparent;border:1px solid var(--line-strong);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:var(--cream);flex-shrink:0;}
+.modal-body{padding:22px 26px 30px;}
+
+.summary-band{
+  display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+  background:var(--pitch-800);border-radius:var(--radius-m);padding:16px 18px;margin-bottom:20px;
+}
+.summary-score{font-family:var(--font-display);font-size:1.5rem;color:var(--willow-bright);}
+.summary-status{color:var(--cream-dim);font-size:0.9rem;}
+
+.inning-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.inning-tab{padding:7px 14px;border-radius:8px;border:1px solid var(--line-strong);background:transparent;color:var(--cream-dim);font-size:0.85rem;font-weight:500;}
+.inning-tab.active{background:var(--pitch-700);color:var(--cream);border-color:var(--willow);}
+
+table.score-table{width:100%;border-collapse:collapse;margin-bottom:22px;}
+table.score-table caption{text-align:left;color:var(--cream);font-weight:600;font-size:0.95rem;margin-bottom:10px;font-family:var(--font-display);}
+table.score-table th{
+  text-align:right;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.03em;color:var(--cream-faint);
+  padding:6px 8px;border-bottom:1px solid var(--line-strong);font-weight:600;
+}
+table.score-table th:first-child, table.score-table td:first-child{text-align:left;}
+table.score-table td{padding:9px 8px;border-bottom:1px solid var(--line);font-size:0.88rem;color:var(--cream);text-align:right;}
+.player-name{display:flex;align-items:center;gap:7px;font-weight:500;}
+.striker-flag{color:var(--willow-bright);font-size:0.75rem;font-weight:700;}
+.dismissal-text{display:block;color:var(--cream-faint);font-size:0.75rem;font-weight:400;margin-top:2px;}
+
+.partnership-box{
+  background:var(--pitch-800);border-radius:var(--radius-m);padding:16px 18px;margin-bottom:22px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+}
+.partnership-box .label{color:var(--cream-faint);font-size:0.78rem;}
+.partnership-box .value{color:var(--cream);font-weight:700;font-family:var(--font-display);font-size:1.05rem;}
+
+.note-line{color:var(--cream-faint);font-size:0.78rem;margin-top:4px;}
+
+/* ============================================================
+   RANKINGS
+   ============================================================ */
+table.rank-table{width:100%;border-collapse:collapse;}
+table.rank-table thead th{
+  text-align:left;padding:12px 14px;font-size:0.76rem;text-transform:uppercase;letter-spacing:0.03em;
+  color:var(--cream-faint);border-bottom:1px solid var(--line-strong);
+}
+table.rank-table tbody td{padding:14px;border-bottom:1px solid var(--line);font-size:0.94rem;}
+table.rank-table tbody tr:hover{background:rgba(243,239,225,0.03);}
+.rank-pos{font-family:var(--font-display);font-weight:700;color:var(--willow-bright);width:40px;}
+.rank-pos.top3{color:var(--ball-bright);}
+.rank-name{font-weight:600;color:var(--cream);}
+.rank-sub{color:var(--cream-faint);font-size:0.8rem;}
+.rank-rating{font-weight:700;text-align:right;color:var(--cream);}
+.rank-table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius-m);background:var(--pitch-800);}
+.rank-table-wrap table{min-width:520px;}
+
+/* ============================================================
+   NEWS
+   ============================================================ */
+.news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px;}
+.news-card{background:var(--pitch-800);border:1px solid var(--line);border-radius:var(--radius-m);overflow:hidden;transition:border-color .15s ease, transform .15s ease;}
+.news-card:hover{border-color:var(--willow);transform:translateY(-2px);}
+.news-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--pitch-700);}
+.news-body{padding:18px 20px;}
+.news-meta{font-size:0.74rem;color:var(--willow-bright);font-weight:600;margin-bottom:8px;}
+.news-title{font-family:var(--font-display);font-size:1.08rem;color:var(--cream);line-height:1.3;margin-bottom:8px;}
+.news-excerpt{font-size:0.86rem;color:var(--cream-dim);}
+.news-link{display:inline-block;margin-top:12px;font-size:0.84rem;font-weight:600;color:var(--willow-bright);}
+.news-link:hover{text-decoration:underline;}
+
+/* ============================================================
+   ABOUT
+   ============================================================ */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;}
+.about-copy p{color:var(--cream-dim);font-size:1.02rem;margin-bottom:16px;max-width:58ch;}
+.feature-list{display:flex;flex-direction:column;gap:22px;}
+.feature-item{display:flex;gap:16px;}
+.feature-item svg{width:24px;height:24px;color:var(--willow-bright);flex-shrink:0;margin-top:3px;}
+.feature-item h4{color:var(--cream);font-size:1.02rem;margin-bottom:4px;}
+.feature-item p{color:var(--cream-dim);font-size:0.9rem;}
+@media (max-width:900px){.about-grid{grid-template-columns:1fr;}}
+
+/* ============================================================
+   CONTACT
+   ============================================================ */
+.contact-grid{display:grid;grid-template-columns:0.9fr 1.1fr;gap:56px;}
+.contact-info-item{display:flex;gap:14px;align-items:flex-start;margin-bottom:24px;}
+.contact-info-item svg{width:22px;height:22px;color:var(--willow-bright);margin-top:2px;flex-shrink:0;}
+.contact-info-item h4{color:var(--cream);font-size:0.98rem;margin-bottom:3px;}
+.contact-info-item p{color:var(--cream-dim);font-size:0.9rem;}
+.social-row{display:flex;gap:10px;margin-top:24px;}
+.social-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;color:var(--cream-dim);transition:.15s ease;}
+.social-btn:hover{border-color:var(--willow-bright);color:var(--willow-bright);}
+.social-btn svg{width:18px;height:18px;}
+
+form.contact-form{background:var(--pitch-800);border:1px solid var(--line);border-radius:var(--radius-l);padding:28px;}
+.field{margin-bottom:18px;}
+.field label{display:block;font-size:0.84rem;color:var(--cream-dim);margin-bottom:7px;font-weight:500;}
+.field input, .field textarea, .field select{
+  width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line-strong);
+  background:var(--pitch-900);color:var(--cream);font-family:inherit;font-size:0.95rem;
+}
+.field input:focus, .field textarea:focus{border-color:var(--willow-bright);}
+.field textarea{resize:vertical;min-height:110px;}
+.form-msg{margin-top:14px;font-size:0.88rem;color:var(--willow-bright);display:none;}
+.form-msg.show{display:block;}
+@media (max-width:900px){.contact-grid{grid-template-columns:1fr;}}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer.site-footer{border-top:1px solid var(--line);padding:64px 0 0;background:var(--pitch-900);}
+.footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;padding-bottom:48px;}
+.footer-brand p{color:var(--cream-dim);font-size:0.92rem;margin-top:14px;max-width:34ch;}
+.footer-col h5{color:var(--cream);font-size:0.86rem;margin-bottom:16px;font-weight:600;}
+.footer-col a{display:block;color:var(--cream-dim);font-size:0.9rem;padding:6px 0;transition:color .15s ease;}
+.footer-col a:hover{color:var(--willow-bright);}
+.footer-bottom{
+  border-top:1px solid var(--line);padding:22px 0;display:flex;justify-content:space-between;
+  align-items:center;flex-wrap:wrap;gap:10px;color:var(--cream-faint);font-size:0.82rem;
+}
+.footer-bottom .stump-mark{display:flex;align-items:center;gap:8px;}
+.footer-bottom .stump-mark svg{width:16px;height:16px;color:var(--willow);}
+@media (max-width:900px){.footer-grid{grid-template-columns:1fr 1fr;}}
+
+/* ============================================================
+   AUTH MODAL
+   ============================================================ */
+.auth-tabs{display:flex;gap:6px;background:var(--pitch-900);border-radius:10px;padding:4px;margin-bottom:22px;}
+.auth-tab{flex:1;padding:9px;border-radius:8px;background:transparent;border:none;color:var(--cream-dim);font-weight:600;font-size:0.9rem;}
+.auth-tab.active{background:var(--pitch-700);color:var(--cream);}
+.auth-panel{display:none;}
+.auth-panel.active{display:block;}
+.field-hint{font-size:0.78rem;color:var(--cream-faint);margin-top:20px;text-align:center;}
+
+/* toast */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--cream);color:var(--ink);padding:14px 22px;border-radius:12px;font-size:0.9rem;font-weight:500;
+  box-shadow:var(--shadow-deep);z-index:200;opacity:0;pointer-events:none;transition:.25s ease;
+  max-width:90vw;text-align:center;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+@media (max-width:640px){
+  .section{padding:56px 0;}
+  .hero{padding:44px 0 40px;}
+  .modal-head, .modal-body{padding-left:18px;padding-right:18px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="#home" class="brand" aria-label="GreenStump home">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="13" cy="8" rx="3.4" ry="2.2" fill="#e8bc4c"/>
+        <ellipse cx="21" cy="8" rx="3.4" ry="2.2" fill="#e8bc4c"/>
+        <rect x="6" y="9" width="4.6" height="26" rx="2" fill="#cf9f2e"/>
+        <rect x="16" y="9" width="4.6" height="26" rx="2" fill="#e8bc4c"/>
+        <rect x="26" y="9" width="4.6" height="26" rx="2" fill="#cf9f2e"/>
+      </svg>
+      <span class="brand-name">Green<em>Stump</em></span>
+    </a>
+
+    <nav class="primary-nav" id="primaryNav">
+      <a href="#home" class="nav-link active" data-nav="home">Home</a>
+      <a href="#live" class="nav-link" data-nav="live">Live Scores</a>
+      <a href="#rankings" class="nav-link" data-nav="rankings">Rankings</a>
+      <a href="#news" class="nav-link" data-nav="news">News</a>
+      <a href="#about" class="nav-link" data-nav="about">About</a>
+      <a href="#contact" class="nav-link" data-nav="contact">Contact</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="btn btn-ghost" data-auth-open="login">Log in</button>
+      <button class="btn btn-solid" data-auth-open="register">Register</button>
+    </div>
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+
+<!-- mobile drawer -->
+<aside class="mobile-drawer" id="mobileDrawer">
+  <div class="drawer-top">
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <a href="#home" class="drawer-link" data-nav="home">Home</a>
+  <a href="#live" class="drawer-link" data-nav="live">Live Scores</a>
+  <a href="#rankings" class="drawer-link" data-nav="rankings">Rankings</a>
+  <a href="#news" class="drawer-link" data-nav="news">News</a>
+  <a href="#about" class="drawer-link" data-nav="about">About</a>
+  <a href="#contact" class="drawer-link" data-nav="contact">Contact</a>
+  <div class="drawer-auth">
+    <button class="btn btn-outline-cream btn-full" data-auth-open="login">Log in</button>
+    <button class="btn btn-solid btn-full" data-auth-open="register">Register</button>
+  </div>
+</aside>
+
+<main>
+
+<!-- ============================================================
+     HOME
+     ============================================================ -->
+<section id="home" class="page-section">
+  <div class="hero wrap">
+    <div class="hero-grid">
+      <div>
+        <h1>Every over. Every&nbsp;edge.<br><span class="accent">Live, ball by ball.</span></h1>
+        <p class="lede">GreenStump brings together live scores, full scorecards, ICC rankings and the day's biggest headlines — updated automatically, all in one place.</p>
+        <div class="hero-cta">
+          <a href="#live" class="btn btn-solid" data-nav="live">Watch live scores</a>
+          <a href="#rankings" class="btn btn-ghost" data-nav="rankings">See rankings</a>
+        </div>
+      </div>
+
+      <div class="hero-panel">
+        <div class="hero-panel-head">
+          <span class="live-tag"><span class="pulse-dot"></span>Live now</span>
+          <a href="#live" class="btn-sm btn btn-ghost" data-nav="live">All matches</a>
+        </div>
+        <div id="heroMatches">
+          <!-- filled by JS: fetchLiveMatches() -->
+          <div class="hero-match"><p class="hero-status">Loading live matches…</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ticker-bar">
+      <div class="ticker-track" id="tickerTrack">
+        <!-- duplicated by JS for seamless loop -->
+      </div>
+    </div>
+
+    <div class="quick-grid">
+      <a class="quick-card" href="#live" data-nav="live">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+        <h3>Live scores</h3>
+        <p>Ball-by-ball updates for live, recent and upcoming matches worldwide.</p>
+        <span class="goto">Open live scores</span>
+      </a>
+      <a class="quick-card" href="#rankings" data-nav="rankings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+        <h3>ICC rankings</h3>
+        <p>Team, batting, bowling and all-rounder rankings across every format.</p>
+        <span class="goto">Open rankings</span>
+      </a>
+      <a class="quick-card" href="#news" data-nav="news">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
+        <h3>Cricket news</h3>
+        <p>The latest headlines and match reports from around the cricket world.</p>
+        <span class="goto">Open news</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="section wrap">
+    <div class="tabbar-row">
+      <div class="section-head" style="margin-bottom:0;">
+        <div class="eyebrow">On now</div>
+        <h2>Live &amp; recent matches</h2>
+      </div>
+      <a href="#live" class="btn btn-ghost btn-sm" data-nav="live">View all</a>
+    </div>
+    <div class="match-grid" id="homeMatchPreview">
+      <div class="state-msg"><strong>Loading matches…</strong>Fetching the latest scores.</div>
+    </div>
+  </div>
+
+  <div class="section wrap">
+    <div class="tabbar-row">
+      <div class="section-head" style="margin-bottom:0;">
+        <div class="eyebrow">Headlines</div>
+        <h2>Latest news</h2>
+      </div>
+      <a href="#news" class="btn btn-ghost btn-sm" data-nav="news">View all</a>
+    </div>
+    <div class="news-grid" id="homeNewsPreview">
+      <div class="state-msg"><strong>Loading headlines…</strong>Fetching the latest stories.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     LIVE SCORES
+     ============================================================ -->
+<section id="live" class="page-section section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Scores</div>
+      <h2>Live scores</h2>
+      <p>Every match, as it happens. Tap any card for the full scorecard, partnerships and who's on strike.</p>
+    </div>
+
+    <div class="tabbar" id="liveTabs">
+      <button class="tab-pill active" data-status="live">Live</button>
+      <button class="tab-pill" data-status="recent">Recent</button>
+      <button class="tab-pill" data-status="upcoming">Upcoming</button>
+    </div>
+
+    <div class="match-grid" id="liveMatchGrid" style="margin-top:24px;">
+      <div class="state-msg"><strong>Loading matches…</strong>Add your API key in script.js to see live data.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     RANKINGS
+     ============================================================ -->
+<section id="rankings" class="page-section section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Standings</div>
+      <h2>ICC rankings</h2>
+      <p>Team and player rankings across formats, refreshed automatically from the rankings feed.</p>
+    </div>
+
+    <div class="tabbar-row">
+      <div class="tabbar" id="rankFormatTabs">
+        <button class="tab-pill active" data-format="test">Test</button>
+        <button class="tab-pill" data-format="odi">ODI</button>
+        <button class="tab-pill" data-format="t20">T20I</button>
+      </div>
+      <div class="tabbar" id="rankCategoryTabs">
+        <button class="tab-pill active" data-category="teams">Teams</button>
+        <button class="tab-pill" data-category="batting">Batting</button>
+        <button class="tab-pill" data-category="bowling">Bowling</button>
+        <button class="tab-pill" data-category="allrounder">All-rounders</button>
+      </div>
+    </div>
+
+    <div class="rank-table-wrap" style="margin-top:12px;">
+      <table class="rank-table" id="rankTable">
+        <thead>
+          <tr><th>#</th><th>Name</th><th style="text-align:right;">Rating</th></tr>
+        </thead>
+        <tbody id="rankTableBody">
+          <tr><td colspan="3" style="text-align:center;color:var(--cream-faint);padding:32px;">Loading rankings…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note-line" id="rankSourceNote"></p>
+  </div>
+</section>
+
+<!-- ============================================================
+     NEWS
+     ============================================================ -->
+<section id="news" class="page-section section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Headlines</div>
+      <h2>Cricket news</h2>
+      <p>The latest stories, match reports and announcements, pulled in automatically.</p>
+    </div>
+    <div class="news-grid" id="newsGrid">
+      <div class="state-msg"><strong>Loading headlines…</strong>Add a news API key in script.js to enable this.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     ABOUT
+     ============================================================ -->
+<section id="about" class="page-section section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">About us</div>
+      <h2>Built for people who watch every ball</h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-copy">
+        <p>GreenStump started as a simple idea: cricket moves fast, and the scoreboard should move with it. We bring live scores, full scorecards, rankings and news together into one clean feed, so you're never juggling five tabs during a run chase.</p>
+        <p>Everything on this page updates automatically from live data feeds — no manual refreshing, no stale scores. Whether it's a T20 chase going to the last over or a Test match grinding through day four, GreenStump keeps you at the crease.</p>
+      </div>
+      <div class="feature-list">
+        <div class="feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+          <div><h4>Live, automated updates</h4><p>Scores, wickets and overs refresh straight from the data feed as play happens.</p></div>
+        </div>
+        <div class="feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+          <div><h4>Full rankings, every format</h4><p>Team, batting, bowling and all-rounder rankings for Test, ODI and T20I.</p></div>
+        </div>
+        <div class="feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
+          <div><h4>News that matters</h4><p>Headlines and match reports, curated automatically so you catch what counts.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CONTACT
+     ============================================================ -->
+<section id="contact" class="page-section section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Get in touch</div>
+      <h2>Contact GreenStump</h2>
+      <p>Questions, feedback or a data feed you'd like us to add — we'd like to hear it.</p>
+    </div>
+    <div class="contact-grid">
+      <div>
+        <div class="contact-info-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+          <div><h4>Email</h4><p>hello@greenstump.example</p></div>
+        </div>
+        <div class="contact-info-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 3a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.2-1.3a2 2 0 0 1 2.1-.5c1 .3 2 .5 3 .7a2 2 0 0 1 1.7 2Z"/></svg>
+          <div><h4>Support</h4><p>Mon–Fri, 9am–6pm</p></div>
+        </div>
+        <div class="contact-info-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12S3 16 3 10a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <div><h4>Community</h4><p>Built for cricket fans everywhere</p></div>
+        </div>
+        <div class="social-row">
+          <a class="social-btn" href="#" aria-label="X / Twitter"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.6 8.7L23 22h-6.9l-5.4-6.7L4.4 22H1.3l8.1-9.3L1 2h7l4.9 6.1L18.9 2Zm-1.2 18h1.7L7.4 4H5.6l12.1 16Z"/></svg></a>
+          <a class="social-btn" href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1"/></svg></a>
+          <a class="social-btn" href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9.5v5l4.5-2.5Z" fill="currentColor" stroke="none"/></svg></a>
+        </div>
+      </div>
+
+      <form class="contact-form" id="contactForm">
+        <div class="field">
+          <label for="cfName">Name</label>
+          <input id="cfName" type="text" required placeholder="Your name">
+        </div>
+        <div class="field">
+          <label for="cfEmail">Email</label>
+          <input id="cfEmail" type="email" required placeholder="you@example.com">
+        </div>
+        <div class="field">
+          <label for="cfMessage">Message</label>
+          <textarea id="cfMessage" required placeholder="How can we help?"></textarea>
+        </div>
+        <button type="submit" class="btn btn-solid btn-full">Send message</button>
+        <p class="form-msg" id="contactFormMsg">Thanks — your message has been noted. This demo form isn't wired to a backend yet.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#home" class="brand" data-nav="home">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="30" height="30">
+            <ellipse cx="13" cy="8" rx="3.4" ry="2.2" fill="#e8bc4c"/><ellipse cx="21" cy="8" rx="3.4" ry="2.2" fill="#e8bc4c"/>
+            <rect x="6" y="9" width="4.6" height="26" rx="2" fill="#cf9f2e"/><rect x="16" y="9" width="4.6" height="26" rx="2" fill="#e8bc4c"/><rect x="26" y="9" width="4.6" height="26" rx="2" fill="#cf9f2e"/>
+          </svg>
+          <span class="brand-name" style="font-size:1.2rem;">Green<em>Stump</em></span>
+        </a>
+        <p>Live cricket scores, rankings and news, automated from data feeds you control.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Explore</h5>
+        <a href="#home" data-nav="home">Home</a>
+        <a href="#live" data-nav="live">Live scores</a>
+        <a href="#rankings" data-nav="rankings">Rankings</a>
+        <a href="#news" data-nav="news">News</a>
+      </div>
+      <div class="footer-col">
+        <h5>Formats</h5>
+        <a href="#live" data-nav="live">Test matches</a>
+        <a href="#live" data-nav="live">ODIs</a>
+        <a href="#live" data-nav="live">T20Is</a>
+        <a href="#rankings" data-nav="rankings">Rankings</a>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <a href="#about" data-nav="about">About</a>
+        <a href="#contact" data-nav="contact">Contact</a>
+        <a href="#" onclick="return false;">Privacy policy</a>
+        <a href="#" onclick="return false;">Terms of use</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="footYear"></span> GreenStump. All rights reserved.</span>
+      <span class="stump-mark">
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="6" width="3" height="16" rx="1"/><rect x="10.5" y="6" width="3" height="16" rx="1"/><rect x="17" y="6" width="3" height="16" rx="1"/></svg>
+        Every over, accounted for.
+      </span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     SCORECARD MODAL
+     ============================================================ -->
+<div class="modal-scrim" id="scorecardModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <h3 id="scModalTitle">Match</h3>
+        <p class="match-series" id="scModalSeries">Series</p>
+      </div>
+      <button class="modal-close" id="scModalClose" aria-label="Close scorecard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="scModalBody">
+      <!-- filled by JS: openScorecard() -->
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     LOGIN / REGISTER MODAL
+     ============================================================ -->
+<div class="modal-scrim" id="authModal">
+  <div class="modal-card" style="max-width:420px;">
+    <div class="modal-head">
+      <h3>Your account</h3>
+      <button class="modal-close" id="authModalClose" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-auth-tab="login">Log in</button>
+        <button class="auth-tab" data-auth-tab="register">Register</button>
+      </div>
+
+      <form class="auth-panel active" id="loginPanel" data-auth-panel="login">
+        <div class="field"><label for="liEmail">Email</label><input id="liEmail" type="email" required placeholder="you@example.com"></div>
+        <div class="field"><label for="liPass">Password</label><input id="liPass" type="password" required placeholder="••••••••"></div>
+        <button type="submit" class="btn btn-solid btn-full">Log in</button>
+        <p class="field-hint">This is a front-end demo — connect it to your own auth backend to go live.</p>
+      </form>
+
+      <form class="auth-panel" id="registerPanel" data-auth-panel="register">
+        <div class="field"><label for="reName">Full name</label><input id="reName" type="text" required placeholder="Your name"></div>
+        <div class="field"><label for="reEmail">Email</label><input id="reEmail" type="email" required placeholder="you@example.com"></div>
+        <div class="field"><label for="rePass">Password</label><input id="rePass" type="password" required placeholder="••••••••"></div>
+        <button type="submit" class="btn btn-solid btn-full">Create account</button>
+        <p class="field-hint">This is a front-end demo — connect it to your own auth backend to go live.</p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================================================
+   GREENSTUMP — APP SCRIPT
+   ================================================================
+   PUT YOUR API KEYS HERE. This is the only place you need to edit
+   to make live data (scores, rankings, news) start flowing.
+   ================================================================ */
+const CONFIG = {
+  // Cricket live scores / scorecards — https://cricapi.com (free tier available)
+  // Sign up, grab your key, and paste it below.
+  CRIC_API_KEY: "PUT_YOUR_CRICAPI_KEY_HERE",
+  CRIC_API_BASE: "https://api.cricapi.com/v1",
+
+  // Rankings — CricAPI does not provide ICC rankings on the free tier.
+  // Point this at whichever rankings API/endpoint you have access to
+  // (for example a RapidAPI "cricket rankings" endpoint). Leave the key
+  // blank to show sample rankings instead, so the page still looks complete.
+  RANKINGS_API_URL: "", // e.g. "https://<your-rankings-provider>/rankings"
+  RANKINGS_API_KEY: "",
+
+  // News — https://newsapi.org (free tier available) is a good default.
+  // Paste your key below. Leave blank to show sample headlines instead.
+  NEWS_API_KEY: "",
+  NEWS_API_URL: "https://newsapi.org/v2/everything",
+
+  // How often to auto-refresh live data, in milliseconds.
+  REFRESH_INTERVAL_MS: 60000
+};
+
+/* ----------------------------------------------------------------
+   Small helpers
+   ---------------------------------------------------------------- */
+function $(sel, ctx){ return (ctx||document).querySelector(sel); }
+function $all(sel, ctx){ return Array.from((ctx||document).querySelectorAll(sel)); }
+function escapeHtml(str){
+  return String(str==null?"":str).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+function showToast(msg, ms){
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(function(){ t.classList.remove("show"); }, ms || 3200);
+}
+function keyMissing(key){
+  return !key || key.indexOf("PUT_YOUR") === 0 || key.trim() === "";
+}
+
+/* ----------------------------------------------------------------
+   Navigation: single-page section switching + mobile drawer
+   ---------------------------------------------------------------- */
+const sections = $all(".page-section");
+function setActiveSection(id){
+  sections.forEach(function(s){ s.classList.toggle("hidden", s.id !== id); });
+  $all("[data-nav]").forEach(function(el){
+    el.classList.toggle("active", el.getAttribute("data-nav") === id);
+  });
+  window.scrollTo({top:0, behavior:"instant" in window ? "instant" : "auto"});
+}
+function goTo(id){
+  if(!$("#"+id)) return;
+  history.replaceState(null, "", "#"+id);
+  setActiveSection(id);
+  closeDrawer();
+}
+$all("[data-nav]").forEach(function(el){
+  el.addEventListener("click", function(e){
+    e.preventDefault();
+    goTo(el.getAttribute("data-nav"));
+  });
+});
+window.addEventListener("load", function(){
+  const id = (location.hash || "#home").slice(1);
+  setActiveSection($("#"+id) ? id : "home");
+});
+
+const drawer = $("#mobileDrawer"), scrim = $("#scrim");
+function openDrawer(){ drawer.classList.add("open"); scrim.classList.add("show"); $("#menuToggle").setAttribute("aria-expanded","true"); }
+function closeDrawer(){ drawer.classList.remove("open"); scrim.classList.remove("show"); $("#menuToggle").setAttribute("aria-expanded","false"); }
+$("#menuToggle").addEventListener("click", openDrawer);
+$("#drawerClose").addEventListener("click", closeDrawer);
+scrim.addEventListener("click", function(){ closeDrawer(); closeAllModals(); });
+document.addEventListener("keydown", function(e){ if(e.key === "Escape"){ closeDrawer(); closeAllModals(); }});
+
+/* ----------------------------------------------------------------
+   Auth modal (front-end only demo)
+   ---------------------------------------------------------------- */
+const authModal = $("#authModal");
+function openAuth(which){
+  authModal.classList.add("show");
+  scrim.classList.add("show");
+  setAuthTab(which || "login");
+}
+function closeAllModals(){
+  authModal.classList.remove("show");
+  $("#scorecardModal").classList.remove("show");
+  if(!drawer.classList.contains("open")) scrim.classList.remove("show");
+}
+function setAuthTab(which){
+  $all(".auth-tab").forEach(function(t){ t.classList.toggle("active", t.dataset.authTab === which); });
+  $all(".auth-panel").forEach(function(p){ p.classList.toggle("active", p.dataset.authPanel === which); });
+}
+$all("[data-auth-open]").forEach(function(btn){
+  btn.addEventListener("click", function(){ openAuth(btn.getAttribute("data-auth-open")); });
+});
+$("#authModalClose").addEventListener("click", closeAllModals);
+$all(".auth-tab").forEach(function(t){ t.addEventListener("click", function(){ setAuthTab(t.dataset.authTab); }); });
+$("#loginPanel").addEventListener("submit", function(e){
+  e.preventDefault();
+  showToast("Logged in (demo) — connect a real auth backend to make this work.");
+  closeAllModals();
+});
+$("#registerPanel").addEventListener("submit", function(e){
+  e.preventDefault();
+  showToast("Account created (demo) — connect a real auth backend to make this work.");
+  closeAllModals();
+});
+
+/* contact form (front-end only demo) */
+$("#contactForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  $("#contactFormMsg").classList.add("show");
+  this.reset();
+});
+
+$("#footYear").textContent = new Date().getFullYear();
+
+/* ================================================================
+   LIVE SCORES
+   ================================================================ */
+let allMatches = []; // cached, classified matches
+let currentLiveTab = "live";
+
+function classifyMatch(m){
+  if(m.matchStarted === false) return "upcoming";
+  if(m.matchEnded === true) return "finished";
+  if(m.matchStarted === true && m.matchEnded === false) return "live";
+  // fallback: try to infer from status text
+  const s = (m.status || "").toLowerCase();
+  if(s.includes("won") || s.includes("drawn") || s.includes("abandoned") || s.includes("no result")) return "finished";
+  if(s.includes("scheduled") || s.includes("not started")) return "upcoming";
+  return "live";
+}
+
+function scoreLine(m){
+  // CricAPI-style: m.score = [{r,w,o,inning:"Team Name Inning 1"}, ...]
+  if(!Array.isArray(m.score) || m.score.length === 0) return null;
+  return m.score.map(function(inn){
+    const overs = (inn.o !== undefined && inn.o !== null) ? " (" + inn.o + ")" : "";
+    const wkts = (inn.w !== undefined && inn.w !== null) ? "/" + inn.w : "";
+    return { label: inn.inning || "", text: (inn.r !== undefined ? inn.r : "-") + wkts + overs };
+  });
+}
+
+async function fetchLiveMatches(){
+  if(keyMissing(CONFIG.CRIC_API_KEY)){
+    renderMatchState("Add your CricAPI key", "Paste your key into CONFIG.CRIC_API_KEY in the script to load real matches.");
+    renderHeroState("Add your CricAPI key in script.js to load live matches.");
+    return;
+  }
+  try{
+    const url = CONFIG.CRIC_API_BASE + "/currentMatches?apikey=" + encodeURIComponent(CONFIG.CRIC_API_KEY) + "&offset=0";
+    const res = await fetch(url);
+    const json = await res.json();
+    if(json.status && json.status !== "success"){
+      throw new Error(json.message || "API returned an error");
+    }
+    allMatches = Array.isArray(json.data) ? json.data : [];
+    renderHeroMatches();
+    renderTicker();
+    renderHomeMatchPreview();
+    renderLiveGrid(currentLiveTab);
+  }catch(err){
+    console.error("fetchLiveMatches failed:", err);
+    renderMatchState("Couldn't load matches", "Check your API key and network connection, then refresh.");
+    renderHeroState("Couldn't load live matches right now.");
+  }
+}
+
+function renderMatchState(title, sub){
+  const html = '<div class="state-msg"><strong>' + escapeHtml(title) + '</strong>' + escapeHtml(sub) + '</div>';
+  $("#liveMatchGrid").innerHTML = html;
+  $("#homeMatchPreview").innerHTML = html;
+}
+function renderHeroState(msg){
+  $("#heroMatches").innerHTML = '<p class="hero-status">' + escapeHtml(msg) + '</p>';
+}
+
+function renderHeroMatches(){
+  const live = allMatches.filter(function(m){ return classifyMatch(m) === "live"; }).slice(0,3);
+  const list = live.length ? live : allMatches.slice(0,3);
+  if(!list.length){ renderHeroState("No matches available right now."); return; }
+  $("#heroMatches").innerHTML = list.map(function(m){
+    const lines = scoreLine(m) || [];
+    const teamText = (m.teams || []).join(" vs ");
+    const scoreText = lines.length ? lines.map(function(l){ return l.text; }).join("  ·  ") : "";
+    return '<div class="hero-match">' +
+      '<div class="hero-teams"><span>' + escapeHtml(teamText) + '</span>' + (scoreText ? '<span class="score tnum">' + escapeHtml(scoreText) + '</span>' : '') + '</div>' +
+      '<div class="hero-status">' + escapeHtml(m.status || "") + '</div>' +
+    '</div>';
+  }).join("");
+}
+
+function renderTicker(){
+  if(!allMatches.length) return;
+  const items = allMatches.slice(0,10).map(function(m){
+    const teamText = (m.teams || []).join(" vs ");
+    return '<div class="ticker-item"><span class="ticker-dot"></span><b>' + escapeHtml(teamText) + '</b>&nbsp;— ' + escapeHtml(m.status || "") + '</div>';
+  }).join("");
+  // duplicate content once for a seamless CSS loop
+  $("#tickerTrack").innerHTML = items + items;
+}
+
+function matchCardHtml(m, idx){
+  const status = classifyMatch(m);
+  const chipClass = status === "live" ? "live" : (status === "finished" ? "finished" : "upcoming");
+  const chipLabel = status === "live" ? "Live" : (status === "finished" ? "Finished" : "Upcoming");
+  const lines = scoreLine(m) || [];
+  const teams = m.teams || [];
+  const teamRows = teams.map(function(t, i){
+    const line = lines[i];
+    return '<div class="team-row"><span class="team-name">' + escapeHtml(t) + '</span>' + (line ? '<span class="team-score tnum">' + escapeHtml(line.text) + '</span>' : '') + '</div>';
+  }).join("");
+
+  return '<button class="match-card" data-match-id="' + escapeHtml(m.id || idx) + '">' +
+    '<div class="match-card-top"><span class="match-series">' + escapeHtml(m.name || m.matchType || "Match") + '</span>' +
+      '<span class="status-chip ' + chipClass + '">' + (status === "live" ? '<span class="pulse-dot"></span>' : '') + chipLabel + '</span></div>' +
+    '<div class="match-teams">' + (teamRows || '<div class="team-row"><span class="team-name">Teams TBC</span></div>') + '</div>' +
+    '<div class="match-status-line">' + escapeHtml(m.status || "") + '</div>' +
+    '<div class="venue-line">' + escapeHtml(m.venue || "") + '</div>' +
+  '</button>';
+}
+
+function renderLiveGrid(tab){
+  currentLiveTab = tab;
+  const statusMap = { live: "live", recent: "finished", upcoming: "upcoming" };
+  const wanted = statusMap[tab] || "live";
+  const filtered = allMatches.filter(function(m){ return classifyMatch(m) === wanted; });
+  const grid = $("#liveMatchGrid");
+  if(!filtered.length){
+    grid.innerHTML = '<div class="state-msg"><strong>No ' + tab + ' matches</strong>Nothing to show in this tab right now — try another tab or check back soon.</div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(function(m,i){ return matchCardHtml(m,i); }).join("");
+  bindMatchCardClicks(grid);
+}
+
+function renderHomeMatchPreview(){
+  const preview = allMatches.slice(0,6);
+  const grid = $("#homeMatchPreview");
+  if(!preview.length){ grid.innerHTML = '<div class="state-msg"><strong>No matches yet</strong>Check back shortly.</div>'; return; }
+  grid.innerHTML = preview.map(function(m,i){ return matchCardHtml(m,i); }).join("");
+  bindMatchCardClicks(grid);
+}
+
+function bindMatchCardClicks(container){
+  $all(".match-card", container).forEach(function(card){
+    card.addEventListener("click", function(){ openScorecard(card.getAttribute("data-match-id")); });
+  });
+}
+
+$all("#liveTabs .tab-pill").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    $all("#liveTabs .tab-pill").forEach(function(b){ b.classList.remove("active"); });
+    btn.classList.add("active");
+    renderLiveGrid(btn.getAttribute("data-status"));
+  });
+});
+
+/* ----------------------------------------------------------------
+   Scorecard modal — batting, bowling, partnership, who's on strike
+   ---------------------------------------------------------------- */
+const scorecardModal = $("#scorecardModal");
+$("#scModalClose").addEventListener("click", closeAllModals);
+
+async function openScorecard(matchId){
+  const match = allMatches.find(function(m){ return String(m.id) === String(matchId); });
+  scorecardModal.classList.add("show");
+  scrim.classList.add("show");
+  $("#scModalTitle").textContent = match ? (match.teams || []).join(" vs ") : "Match";
+  $("#scModalSeries").textContent = match ? (match.name || "") : "";
+  $("#scModalBody").innerHTML = '<p style="color:var(--cream-dim);">Loading full scorecard…</p>';
+
+  if(keyMissing(CONFIG.CRIC_API_KEY)){
+    $("#scModalBody").innerHTML = '<div class="state-msg"><strong>Add your CricAPI key</strong>Paste it into CONFIG.CRIC_API_KEY to load full scorecards.</div>';
+    return;
+  }
+
+  try{
+    const url = CONFIG.CRIC_API_BASE + "/match_scorecard?apikey=" + encodeURIComponent(CONFIG.CRIC_API_KEY) + "&id=" + encodeURIComponent(matchId);
+    const res = await fetch(url);
+    const json = await res.json();
+    if(json.status && json.status !== "success") throw new Error(json.message || "API returned an error");
+    renderScorecard(json.data, match);
+  }catch(err){
+    console.error("openScorecard failed:", err);
+    $("#scModalBody").innerHTML = '<div class="state-msg"><strong>Couldn\'t load the scorecard</strong>The match provider may use slightly different field names — check the browser console and adjust renderScorecard() in script.js if needed.</div>';
+  }
+}
+
+function renderScorecard(data, match){
+  if(!data){ $("#scModalBody").innerHTML = '<p style="color:var(--cream-dim);">No scorecard available for this match yet.</p>'; return; }
+
+  const summaryScore = (scoreLine(data) || (match ? scoreLine(match) : null) || [])
+    .map(function(l){ return l.text; }).join("  ·  ");
+
+  let html = '<div class="summary-band">' +
+    '<div><div class="summary-score tnum">' + escapeHtml(summaryScore || "—") + '</div></div>' +
+    '<div class="summary-status">' + escapeHtml(data.status || (match ? match.status : "") || "") + '</div>' +
+  '</div>';
+
+  const innings = Array.isArray(data.scorecard) ? data.scorecard : [];
+  if(!innings.length){
+    html += '<p style="color:var(--cream-dim);">Ball-by-ball scorecard isn\'t available for this match yet — it may not have started.</p>';
+    $("#scModalBody").innerHTML = html;
+    return;
+  }
+
+  html += '<div class="inning-tabs">' + innings.map(function(inn, i){
+    return '<button class="inning-tab' + (i===0?' active':'') + '" data-inn="' + i + '">' + escapeHtml(inn.inning || ("Innings " + (i+1))) + '</button>';
+  }).join("") + '</div>';
+
+  html += '<div id="inningPanels">' + innings.map(function(inn, i){ return inningPanelHtml(inn, i); }).join("") + '</div>';
+
+  $("#scModalBody").innerHTML = html;
+
+  $all("#scModalBody .inning-tab").forEach(function(tab){
+    tab.addEventListener("click", function(){
+      $all("#scModalBody .inning-tab").forEach(function(t){ t.classList.remove("active"); });
+      tab.classList.add("active");
+      $all("#scModalBody .inning-panel").forEach(function(p){ p.classList.toggle("hidden", p.dataset.inn !== tab.dataset.inn); });
+    });
+  });
+}
+
+function inningPanelHtml(inn, idx){
+  const batting = Array.isArray(inn.batting) ? inn.batting : (Array.isArray(inn.batsman) ? inn.batsman : []);
+  const bowling = Array.isArray(inn.bowling) ? inn.bowling : (Array.isArray(inn.bowler) ? inn.bowler : []);
+
+  // Not-out batsmen are the current pair at the crease during a live innings.
+  const notOut = batting.filter(function(b){
+    const dText = (b["dismissal-text"] || b.dismissal || "").toLowerCase();
+    return dText === "" || dText === "not out" || dText === "batting";
+  });
+  // Heuristic for who's on strike: prefer an explicit flag if the provider sends one,
+  // otherwise assume the not-out batsman with the most balls faced is on strike.
+  let strikerId = null;
+  const flagged = notOut.find(function(b){ return b.onStrike === true || b.isStriker === true; });
+  if(flagged){
+    strikerId = flagged.batsman ? flagged.batsman.id : flagged.id;
+  } else if(notOut.length){
+    const sorted = notOut.slice().sort(function(a,b){ return (Number(b.b)||0) - (Number(a.b)||0); });
+    const top = sorted[0];
+    strikerId = top.batsman ? top.batsman.id : top.id;
+  }
+
+  const battingRows = batting.map(function(b){
+    const name = b.batsman ? b.batsman.name : (b.name || "—");
+    const bId = b.batsman ? b.batsman.id : b.id;
+    const isStriker = strikerId !== null && bId === strikerId;
+    const dismissal = b["dismissal-text"] || b.dismissal || (notOut.indexOf(b) > -1 ? "not out" : "");
+    return '<tr><td><span class="player-name">' + escapeHtml(name) + (isStriker ? ' <span class="striker-flag">●</span>' : '') + '<span class="dismissal-text">' + escapeHtml(dismissal) + '</span></span></td>' +
+      '<td class="tnum">' + escapeHtml(b.r != null ? b.r : "-") + '</td>' +
+      '<td class="tnum">' + escapeHtml(b.b != null ? b.b : "-") + '</td>' +
+      '<td class="tnum">' + escapeHtml(b["4s"] != null ? b["4s"] : "-") + '</td>' +
+      '<td class="tnum">' + escapeHtml(b["6s"] != null ? b["6s"] : "-") + '</td>' +
+      '<td class="tnum">' + escapeHtml(b.sr != null ? b.sr : "-") + '</td></tr>';
+  }).join("");
+
+  const bowlingRows = bowling.map(function(b){
+    const name = b.bowler ? b.bowler.name : (b.name || "—");
+    return '<tr><td>' + escapeHtml(name) + '</td>' +
+      '<td class="tnum">' + escapeHtml(b.o != null ? b.o : "-") + '</td>' +
+      '<td class="tnum">' + escapeHtml(b.m != null ? b.m : "-") + '</td>' +
+      '<td class="tnum">' + escapeHtml(b.r != null ? b.r : "-") + '</td>' +
+      '<td class="tnum">' + escapeHtml(b.w != null ? b.w : "-") + '</td>' +
+      '<td class="tnum">' + escapeHtml(b.eco != null ? b.eco : "-") + '</td></tr>';
+  }).join("");
+
+  // Simple current-partnership estimate from the not-out pair, when the innings is live.
+  let partnershipHtml = "";
+  if(notOut.length >= 2){
+    const runs = notOut.reduce(function(sum,b){ return sum + (Number(b.r)||0); }, 0);
+    const balls = notOut.reduce(function(sum,b){ return sum + (Number(b.b)||0); }, 0);
+    const names = notOut.map(function(b){ return b.batsman ? b.batsman.name : b.name; }).join(" &amp; ");
+    partnershipHtml = '<div class="partnership-box"><div><div class="label">Current partnership</div><div class="value">' + names + '</div></div>' +
+      '<div class="value tnum">' + runs + ' runs (' + balls + ' balls)</div></div>';
+  }
+
+  return '<div class="inning-panel' + (idx===0?'':' hidden') + '" data-inn="' + idx + '">' +
+    partnershipHtml +
+    '<table class="score-table"><caption>Batting</caption><thead><tr><th>Batter</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead>' +
+    '<tbody>' + (battingRows || '<tr><td colspan="6" style="text-align:center;color:var(--cream-faint);">No batting data yet</td></tr>') + '</tbody></table>' +
+    '<table class="score-table"><caption>Bowling</caption><thead><tr><th>Bowler</th><th>O</th><th>M</th><th>R</th><th>W</th><th>Econ</th></tr></thead>' +
+    '<tbody>' + (bowlingRows || '<tr><td colspan="6" style="text-align:center;color:var(--cream-faint);">No bowling data yet</td></tr>') + '</tbody></table>' +
+  '</div>';
+}
+
+/* ================================================================
+   RANKINGS
+   ================================================================ */
+let rankState = { format: "test", category: "teams" };
+
+// Sample fallback data, shown automatically until you connect a rankings API.
+const SAMPLE_RANKINGS = {
+  teams: [
+    {name:"Australia", sub:"Men's Test", rating:128},
+    {name:"India", sub:"Men's Test", rating:124},
+    {name:"South Africa", sub:"Men's Test", rating:113},
+    {name:"England", sub:"Men's Test", rating:107},
+    {name:"New Zealand", sub:"Men's Test", rating:102},
+    {name:"Pakistan", sub:"Men's Test", rating:97},
+    {name:"Sri Lanka", sub:"Men's Test", rating:88},
+    {name:"Bangladesh", sub:"Men's Test", rating:76}
+  ],
+  batting: [
+    {name:"J. Root", sub:"England", rating:892},
+    {name:"K. Williamson", sub:"New Zealand", rating:878},
+    {name:"S. Gill", sub:"India", rating:861},
+    {name:"H. Head", sub:"Australia", rating:847},
+    {name:"B. Mitchell", sub:"South Africa", rating:820},
+    {name:"R. Ravindra", sub:"New Zealand", rating:803}
+  ],
+  bowling: [
+    {name:"J. Bumrah", sub:"India", rating:901},
+    {name:"P. Cummins", sub:"Australia", rating:867},
+    {name:"K. Jamieson", sub:"New Zealand", rating:822},
+    {name:"K. Rabada", sub:"South Africa", rating:809},
+    {name:"N. Lyon", sub:"Australia", rating:788},
+    {name:"S. Bahadur", sub:"Sri Lanka", rating:754}
+  ],
+  allrounder: [
+    {name:"J. Bracewell", sub:"New Zealand", rating:412},
+    {name:"R. Jadeja", sub:"India", rating:398},
+    {name:"M. Labuschagne", sub:"Australia", rating:355},
+    {name:"C. Green", sub:"Australia", rating:341},
+    {name:"M. Ali", sub:"England", rating:301}
+  ]
+};
+
+async function fetchRankings(){
+  const tbody = $("#rankTableBody");
+  tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--cream-faint);padding:32px;">Loading rankings…</td></tr>';
+
+  if(keyMissing(CONFIG.RANKINGS_API_KEY) || !CONFIG.RANKINGS_API_URL){
+    renderRankingRows(SAMPLE_RANKINGS[rankState.category] || []);
+    $("#rankSourceNote").textContent = "Showing sample rankings — set CONFIG.RANKINGS_API_URL and CONFIG.RANKINGS_API_KEY in script.js to load live data.";
+    return;
+  }
+
+  try{
+    const url = CONFIG.RANKINGS_API_URL + "?apikey=" + encodeURIComponent(CONFIG.RANKINGS_API_KEY) +
+      "&format=" + encodeURIComponent(rankState.format) + "&category=" + encodeURIComponent(rankState.category);
+    const res = await fetch(url);
+    const json = await res.json();
+    // Adjust this mapping to match your rankings provider's actual response shape.
+    const rows = (json.data || json.rankings || []).map(function(r){
+      return { name: r.name || r.team || r.player, sub: r.country || r.format || "", rating: r.rating || r.points };
+    });
+    if(!rows.length) throw new Error("Empty rankings response");
+    renderRankingRows(rows);
+    $("#rankSourceNote").textContent = "";
+  }catch(err){
+    console.error("fetchRankings failed:", err);
+    renderRankingRows(SAMPLE_RANKINGS[rankState.category] || []);
+    $("#rankSourceNote").textContent = "Live rankings couldn't be loaded — showing sample data instead.";
+  }
+}
+
+function renderRankingRows(rows){
+  const tbody = $("#rankTableBody");
+  if(!rows.length){
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--cream-faint);padding:32px;">No rankings to show.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(function(r, i){
+    const pos = i + 1;
+    return '<tr><td class="rank-pos' + (pos<=3 ? ' top3':'') + '">' + pos + '</td>' +
+      '<td><div class="rank-name">' + escapeHtml(r.name) + '</div>' + (r.sub ? '<div class="rank-sub">' + escapeHtml(r.sub) + '</div>' : '') + '</td>' +
+      '<td class="rank-rating tnum">' + escapeHtml(r.rating) + '</td></tr>';
+  }).join("");
+}
+
+$all("#rankFormatTabs .tab-pill").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    $all("#rankFormatTabs .tab-pill").forEach(function(b){ b.classList.remove("active"); });
+    btn.classList.add("active");
+    rankState.format = btn.getAttribute("data-format");
+    fetchRankings();
+  });
+});
+$all("#rankCategoryTabs .tab-pill").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    $all("#rankCategoryTabs .tab-pill").forEach(function(b){ b.classList.remove("active"); });
+    btn.classList.add("active");
+    rankState.category = btn.getAttribute("data-category");
+    fetchRankings();
+  });
+});
+
+/* ================================================================
+   NEWS
+   ================================================================ */
+const SAMPLE_NEWS = [
+  {title:"Series decider set for a full house as both sides chase the trophy", source:"GreenStump Desk", excerpt:"With the series tied at 1-1, the final match promises a full house and a straight shootout for the trophy.", url:"#"},
+  {title:"Uncapped seamer added to the squad ahead of the away tour", source:"GreenStump Desk", excerpt:"Selectors have turned to a uncapped, pace bowler as cover for the upcoming tour, citing recent domestic form.", url:"#"},
+  {title:"Board confirms venues for next year's home season", source:"GreenStump Desk", excerpt:"Five host cities have been confirmed for the upcoming home season, with tickets expected to go on sale shortly.", url:"#"},
+  {title:"Rain washes out day three, leaving the Test finely poised", source:"GreenStump Desk", excerpt:"Persistent rain wiped out the entire third day's play, leaving both sides needing quick runs when the skies clear.", url:"#"}
+];
+
+async function fetchNews(){
+  const grids = [$("#newsGrid"), $("#homeNewsPreview")];
+  if(keyMissing(CONFIG.NEWS_API_KEY)){
+    renderNews(SAMPLE_NEWS);
+    return;
+  }
+  try{
+    const url = CONFIG.NEWS_API_URL + "?q=cricket&sortBy=publishedAt&language=en&pageSize=12&apiKey=" + encodeURIComponent(CONFIG.NEWS_API_KEY);
+    const res = await fetch(url);
+    const json = await res.json();
+    if(json.status && json.status !== "ok") throw new Error(json.message || "API returned an error");
+    const articles = (json.articles || []).map(function(a){
+      return { title: a.title, source: (a.source && a.source.name) || "News", excerpt: a.description || "", url: a.url, image: a.urlToImage };
+    });
+    if(!articles.length) throw new Error("No articles returned");
+    renderNews(articles);
+  }catch(err){
+    console.error("fetchNews failed:", err);
+    renderNews(SAMPLE_NEWS);
+  }
+}
+
+function renderNews(articles){
+  const full = articles.map(newsCardHtml).join("");
+  const preview = articles.slice(0,3).map(newsCardHtml).join("");
+  $("#newsGrid").innerHTML = full || '<div class="state-msg"><strong>No headlines yet</strong>Check back soon.</div>';
+  $("#homeNewsPreview").innerHTML = preview || '<div class="state-msg"><strong>No headlines yet</strong>Check back soon.</div>';
+}
+
+function newsCardHtml(a){
+  const img = a.image ? '<img class="news-thumb" src="' + escapeHtml(a.image) + '" alt="" loading="lazy">' : '<div class="news-thumb"></div>';
+  return '<article class="news-card">' + img +
+    '<div class="news-body">' +
+      '<div class="news-meta">' + escapeHtml(a.source || "News") + '</div>' +
+      '<h3 class="news-title">' + escapeHtml(a.title || "") + '</h3>' +
+      '<p class="news-excerpt">' + escapeHtml(a.excerpt || "") + '</p>' +
+      '<a class="news-link" href="' + escapeHtml(a.url || "#") + '" target="_blank" rel="noopener">Read more</a>' +
+    '</div>' +
+  '</article>';
+}
+
+/* ================================================================
+   BOOT
+   ================================================================ */
+fetchLiveMatches();
+fetchRankings();
+fetchNews();
+setInterval(fetchLiveMatches, CONFIG.REFRESH_INTERVAL_MS);
+</script>
+</body>
+</html>
