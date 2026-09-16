@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GreenStump — Live Cricket Scores, Rankings &amp; News</title>
+<meta name="description" content="Live cricket scores, ball-by-ball scorecards, ICC rankings and news — all in one place.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="CSS/style.css">
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="#home" class="brand" aria-label="GreenStump home">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="13" cy="8" rx="3.4" ry="2.2" fill="#e8bc4c"/>
+        <ellipse cx="21" cy="8" rx="3.4" ry="2.2" fill="#e8bc4c"/>
+        <rect x="6" y="9" width="4.6" height="26" rx="2" fill="#cf9f2e"/>
+        <rect x="16" y="9" width="4.6" height="26" rx="2" fill="#e8bc4c"/>
+        <rect x="26" y="9" width="4.6" height="26" rx="2" fill="#cf9f2e"/>
+      </svg>
+      <span class="brand-name">Green<em>Stump</em></span>
+    </a>
+
+    <nav class="primary-nav" id="primaryNav">
+      <a href="#home" class="nav-link active" data-nav="home">Home</a>
+      <a href="#live" class="nav-link" data-nav="live">Live Scores</a>
+      <a href="#rankings" class="nav-link" data-nav="rankings">Rankings</a>
+      <a href="#news" class="nav-link" data-nav="news">News</a>
+      <a href="#about" class="nav-link" data-nav="about">About</a>
+      <a href="#contact" class="nav-link" data-nav="contact">Contact</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="btn btn-ghost" data-auth-open="login">Log in</button>
+      <button class="btn btn-solid" data-auth-open="register">Register</button>
+    </div>
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+
+<!-- mobile drawer -->
+<aside class="mobile-drawer" id="mobileDrawer">
+  <div class="drawer-top">
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <a href="#home" class="drawer-link" data-nav="home">Home</a>
+  <a href="#live" class="drawer-link" data-nav="live">Live Scores</a>
+  <a href="#rankings" class="drawer-link" data-nav="rankings">Rankings</a>
+  <a href="#news" class="drawer-link" data-nav="news">News</a>
+  <a href="#about" class="drawer-link" data-nav="about">About</a>
+  <a href="#contact" class="drawer-link" data-nav="contact">Contact</a>
+  <div class="drawer-auth">
+    <button class="btn btn-outline-cream btn-full" data-auth-open="login">Log in</button>
+    <button class="btn btn-solid btn-full" data-auth-open="register">Register</button>
+  </div>
+</aside>
+
+<main>
+
+<!-- ============================================================
+     HOME
+     ============================================================ -->
+<section id="home" class="page-section">
+  <div class="hero wrap">
+    <div class="hero-grid">
+      <div>
+        <h1>Every over. Every&nbsp;edge.<br><span class="accent">Live, ball by ball.</span></h1>
+        <p class="lede">GreenStump brings together live scores, full scorecards, ICC rankings and the day's biggest headlines — updated automatically, all in one place.</p>
+        <div class="hero-cta">
+          <a href="#live" class="btn btn-solid" data-nav="live">Watch live scores</a>
+          <a href="#rankings" class="btn btn-ghost" data-nav="rankings">See rankings</a>
+        </div>
+      </div>
+
+      <div class="hero-panel">
+        <div class="hero-panel-head">
+          <span class="live-tag"><span class="pulse-dot"></span>Live now</span>
+          <a href="#live" class="btn-sm btn btn-ghost" data-nav="live">All matches</a>
+        </div>
+        <div id="heroMatches">
+          <!-- filled by JS: fetchLiveMatches() -->
+          <div class="hero-match"><p class="hero-status">Loading live matches…</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ticker-bar">
+      <div class="ticker-track" id="tickerTrack">
+        <!-- duplicated by JS for seamless loop -->
+      </div>
+    </div>
+
+    <div class="quick-grid">
+      <a class="quick-card" href="#live" data-nav="live">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+        <h3>Live scores</h3>
+        <p>Ball-by-ball updates for live, recent and upcoming matches worldwide.</p>
+        <span class="goto">Open live scores</span>
+      </a>
+      <a class="quick-card" href="#rankings" data-nav="rankings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+        <h3>ICC rankings</h3>
+        <p>Team, batting, bowling and all-rounder rankings across every format.</p>
+        <span class="goto">Open rankings</span>
+      </a>
+      <a class="quick-card" href="#news" data-nav="news">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
+        <h3>Cricket news</h3>
+        <p>The latest headlines and match reports from around the cricket world.</p>
+        <span class="goto">Open news</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="section wrap">
+    <div class="tabbar-row">
+      <div class="section-head" style="margin-bottom:0;">
+        <div class="eyebrow">On now</div>
+        <h2>Live &amp; recent matches</h2>
+      </div>
+      <a href="#live" class="btn btn-ghost btn-sm" data-nav="live">View all</a>
+    </div>
+    <div class="match-grid" id="homeMatchPreview">
+      <div class="state-msg"><strong>Loading matches…</strong>Fetching the latest scores.</div>
+    </div>
+  </div>
+
+  <div class="section wrap">
+    <div class="tabbar-row">
+      <div class="section-head" style="margin-bottom:0;">
+        <div class="eyebrow">Headlines</div>
+        <h2>Latest news</h2>
+      </div>
+      <a href="#news" class="btn btn-ghost btn-sm" data-nav="news">View all</a>
+    </div>
+    <div class="news-grid" id="homeNewsPreview">
+      <div class="state-msg"><strong>Loading headlines…</strong>Fetching the latest stories.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     LIVE SCORES
+     ============================================================ -->
+<section id="live" class="page-section section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Scores</div>
+      <h2>Live scores</h2>
+      <p>Every match, as it happens. Tap any card for the full scorecard, partnerships and who's on strike.</p>
+    </div>
+
+    <div class="tabbar" id="liveTabs">
+      <button class="tab-pill active" data-status="live">Live</button>
+      <button class="tab-pill" data-status="recent">Recent</button>
+      <button class="tab-pill" data-status="upcoming">Upcoming</button>
+    </div>
+
+    <div class="match-grid" id="liveMatchGrid" style="margin-top:24px;">
+      <div class="state-msg"><strong>Loading matches…</strong>Add your API key in script.js to see live data.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     RANKINGS
+     ============================================================ -->
+<section id="rankings" class="page-section section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Standings</div>
+      <h2>ICC rankings</h2>
+      <p>Team and player rankings across formats, refreshed automatically from the rankings feed.</p>
+    </div>
+
+    <div class="tabbar-row">
+      <div class="tabbar" id="rankFormatTabs">
+        <button class="tab-pill active" data-format="test">Test</button>
+        <button class="tab-pill" data-format="odi">ODI</button>
+        <button class="tab-pill" data-format="t20">T20I</button>
+      </div>
+      <div class="tabbar" id="rankCategoryTabs">
+        <button class="tab-pill active" data-category="teams">Teams</button>
+        <button class="tab-pill" data-category="batting">Batting</button>
+        <button class="tab-pill" data-category="bowling">Bowling</button>
+        <button class="tab-pill" data-category="allrounder">All-rounders</button>
+      </div>
+    </div>
+
+    <div class="rank-table-wrap" style="margin-top:12px;">
+      <table class="rank-table" id="rankTable">
+        <thead>
+          <tr><th>#</th><th>Name</th><th style="text-align:right;">Rating</th></tr>
+        </thead>
+        <tbody id="rankTableBody">
+          <tr><td colspan="3" style="text-align:center;color:var(--cream-faint);padding:32px;">Loading rankings…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note-line" id="rankSourceNote"></p>
+  </div>
+</section>
+
+<!-- ============================================================
+     NEWS
+     ============================================================ -->
+<section id="news" class="page-section section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Headlines</div>
+      <h2>Cricket news</h2>
+      <p>The latest stories, match reports and announcements, pulled in automatically.</p>
+    </div>
+    <div class="news-grid" id="newsGrid">
+      <div class="state-msg"><strong>Loading headlines…</strong>Add a news API key in script.js to enable this.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     ABOUT
+     ============================================================ -->
+<section id="about" class="page-section section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">About us</div>
+      <h2>Built for people who watch every ball</h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-copy">
+        <p>GreenStump started as a simple idea: cricket moves fast, and the scoreboard should move with it. We bring live scores, full scorecards, rankings and news together into one clean feed, so you're never juggling five tabs during a run chase.</p>
+        <p>Everything on this page updates automatically from live data feeds — no manual refreshing, no stale scores. Whether it's a T20 chase going to the last over or a Test match grinding through day four, GreenStump keeps you at the crease.</p>
+      </div>
+      <div class="feature-list">
+        <div class="feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+          <div><h4>Live, automated updates</h4><p>Scores, wickets and overs refresh straight from the data feed as play happens.</p></div>
+        </div>
+        <div class="feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+          <div><h4>Full rankings, every format</h4><p>Team, batting, bowling and all-rounder rankings for Test, ODI and T20I.</p></div>
+        </div>
+        <div class="feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
+          <div><h4>News that matters</h4><p>Headlines and match reports, curated automatically so you catch what counts.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CONTACT
+     ============================================================ -->
+<section id="contact" class="page-section section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Get in touch</div>
+      <h2>Contact GreenStump</h2>
+      <p>Questions, feedback or a data feed you'd like us to add — we'd like to hear it.</p>
+    </div>
+    <div class="contact-grid">
+      <div>
+        <div class="contact-info-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+          <div><h4>Email</h4><p>hello@greenstump.example</p></div>
+        </div>
+        <div class="contact-info-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 3a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.2-1.3a2 2 0 0 1 2.1-.5c1 .3 2 .5 3 .7a2 2 0 0 1 1.7 2Z"/></svg>
+          <div><h4>Support</h4><p>Mon–Fri, 9am–6pm</p></div>
+        </div>
+        <div class="contact-info-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12S3 16 3 10a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <div><h4>Community</h4><p>Built for cricket fans everywhere</p></div>
+        </div>
+        <div class="social-row">
+          <a class="social-btn" href="#" aria-label="X / Twitter"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.6 8.7L23 22h-6.9l-5.4-6.7L4.4 22H1.3l8.1-9.3L1 2h7l4.9 6.1L18.9 2Zm-1.2 18h1.7L7.4 4H5.6l12.1 16Z"/></svg></a>
+          <a class="social-btn" href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1"/></svg></a>
+          <a class="social-btn" href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9.5v5l4.5-2.5Z" fill="currentColor" stroke="none"/></svg></a>
+        </div>
+      </div>
+
+      <form class="contact-form" id="contactForm">
+        <div class="field">
+          <label for="cfName">Name</label>
+          <input id="cfName" type="text" required placeholder="Your name">
+        </div>
+        <div class="field">
+          <label for="cfEmail">Email</label>
+          <input id="cfEmail" type="email" required placeholder="you@example.com">
+        </div>
+        <div class="field">
+          <label for="cfMessage">Message</label>
+          <textarea id="cfMessage" required placeholder="How can we help?"></textarea>
+        </div>
+        <button type="submit" class="btn btn-solid btn-full">Send message</button>
+        <p class="form-msg" id="contactFormMsg">Thanks — your message has been noted. This demo form isn't wired to a backend yet.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#home" class="brand" data-nav="home">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="30" height="30">
+            <ellipse cx="13" cy="8" rx="3.4" ry="2.2" fill="#e8bc4c"/><ellipse cx="21" cy="8" rx="3.4" ry="2.2" fill="#e8bc4c"/>
+            <rect x="6" y="9" width="4.6" height="26" rx="2" fill="#cf9f2e"/><rect x="16" y="9" width="4.6" height="26" rx="2" fill="#e8bc4c"/><rect x="26" y="9" width="4.6" height="26" rx="2" fill="#cf9f2e"/>
+          </svg>
+          <span class="brand-name" style="font-size:1.2rem;">Green<em>Stump</em></span>
+        </a>
+        <p>Live cricket scores, rankings and news, automated from data feeds you control.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Explore</h5>
+        <a href="#home" data-nav="home">Home</a>
+        <a href="#live" data-nav="live">Live scores</a>
+        <a href="#rankings" data-nav="rankings">Rankings</a>
+        <a href="#news" data-nav="news">News</a>
+      </div>
+      <div class="footer-col">
+        <h5>Formats</h5>
+        <a href="#live" data-nav="live">Test matches</a>
+        <a href="#live" data-nav="live">ODIs</a>
+        <a href="#live" data-nav="live">T20Is</a>
+        <a href="#rankings" data-nav="rankings">Rankings</a>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <a href="#about" data-nav="about">About</a>
+        <a href="#contact" data-nav="contact">Contact</a>
+        <a href="#" onclick="return false;">Privacy policy</a>
+        <a href="#" onclick="return false;">Terms of use</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="footYear"></span> GreenStump. All rights reserved.</span>
+      <span class="stump-mark">
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="6" width="3" height="16" rx="1"/><rect x="10.5" y="6" width="3" height="16" rx="1"/><rect x="17" y="6" width="3" height="16" rx="1"/></svg>
+        Every over, accounted for.
+      </span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     SCORECARD MODAL
+     ============================================================ -->
+<div class="modal-scrim" id="scorecardModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <h3 id="scModalTitle">Match</h3>
+        <p class="match-series" id="scModalSeries">Series</p>
+      </div>
+      <button class="modal-close" id="scModalClose" aria-label="Close scorecard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="scModalBody">
+      <!-- filled by JS: openScorecard() -->
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     LOGIN / REGISTER MODAL
+     ============================================================ -->
+<div class="modal-scrim" id="authModal">
+  <div class="modal-card" style="max-width:420px;">
+    <div class="modal-head">
+      <h3>Your account</h3>
+      <button class="modal-close" id="authModalClose" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-auth-tab="login">Log in</button>
+        <button class="auth-tab" data-auth-tab="register">Register</button>
+      </div>
+
+      <form class="auth-panel active" id="loginPanel" data-auth-panel="login">
+        <div class="field"><label for="liEmail">Email</label><input id="liEmail" type="email" required placeholder="you@example.com"></div>
+        <div class="field"><label for="liPass">Password</label><input id="liPass" type="password" required placeholder="••••••••"></div>
+        <button type="submit" class="btn btn-solid btn-full">Log in</button>
+        <p class="field-hint">This is a front-end demo — connect it to your own auth backend to go live.</p>
+      </form>
+
+      <form class="auth-panel" id="registerPanel" data-auth-panel="register">
+        <div class="field"><label for="reName">Full name</label><input id="reName" type="text" required placeholder="Your name"></div>
+        <div class="field"><label for="reEmail">Email</label><input id="reEmail" type="email" required placeholder="you@example.com"></div>
+        <div class="field"><label for="rePass">Password</label><input id="rePass" type="password" required placeholder="••••••••"></div>
+        <button type="submit" class="btn btn-solid btn-full">Create account</button>
+        <p class="field-hint">This is a front-end demo — connect it to your own auth backend to go live.</p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="JS/script.js"></script>
+</body>
+</html>
